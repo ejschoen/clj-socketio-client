@@ -1,14 +1,17 @@
 (ns clj-socketio-client.core
-  (:use [taoensso.timbre])
+  (:use [taoensso.timbre :only [set-level! debug warn info error]])
   (:require [clojure.pprint])
   (:require [taoensso.timbre.tools.logging])
+  (:require [cheshire.core])
   (:import [org.json JSONObject]
            [io.socket.parser Parser]
            [io.socket.client IO Socket]
            [io.socket.emitter Emitter$Listener]))
 
 
-(taoensso.timbre.tools.logging/use-timbre)
+;;(taoensso.timbre.tools.logging/use-timbre)
+
+(set-level! :info)
 
 (deftype Listener [callback]
   Emitter$Listener
