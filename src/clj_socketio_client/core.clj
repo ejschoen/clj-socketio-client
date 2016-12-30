@@ -40,12 +40,20 @@
 (defn make-socket
   "Make a new socket.  event-map is a map of event names (strings) to Listener instances."
   [url event-map]
-  (let [socket (IO/socket url)
-        effective-event-map (merge default-event-map event-map)]
+  (let [connect-promise (promise)
+        socket (IO/socket url)
+        effective-event-map (merge default-event-map
+                                   {Socket/EVENT_CONNECT (fn [& args]
+                                                           (debug (format "SocketIO client: Connected to %s" url))
+                                                           (deliver connect-promise true))}
+                                   event-map)]
     (doseq [e (keys effective-event-map)]
       (doto socket 
         (.on e (->Listener (get effective-event-map e)))))
-    (connect! socket)))
+    (connect! socket)
+    @connect-promise
+    socket
+    ))
 
 (defn- make-args 
   [msg hash]
