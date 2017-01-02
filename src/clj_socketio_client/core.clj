@@ -79,6 +79,7 @@
 
 (defn make-pass-take-socket
   [url]
+  {:pre [(not-empty url)]}
   (let [socket (make-socket url {"take" (fn [data & rest]
                                       (let [data (cheshire.core/parse-string (.toString data) true)
                                             output (:output data)
