@@ -38,10 +38,12 @@
   (.disconnect socket))
 
 (defn make-socket
-  "Make a new socket.  event-map is a map of event names (strings) to Listener instances."
-  [url event-map]
+  "Make a new socket.  event-map is a map of event names (strings) to Listener instances. path will be used as underlying IO.Options.path"
+  ([url path event-map]
   (let [connect-promise (promise)
-        socket (IO/socket url)
+        option (new io.socket.client.IO$Options)
+        set-path (set! (.-path option) path)
+        socket (IO/socket url option)
         effective-event-map (merge default-event-map
                                    {Socket/EVENT_CONNECT (fn [& args]
                                                            (debug (format "SocketIO client: Connected to %s" url))
@@ -54,6 +56,8 @@
     @connect-promise
     socket
     ))
+
+  ([url event-map] (make-socket url nil event-map)))
 
 (defn- make-args 
   [msg hash]
